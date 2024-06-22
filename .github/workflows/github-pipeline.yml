@@ -1,0 +1,61 @@
+name: Build and Deploy to GCR
+on:
+  push:
+    branches: [ "dev" ]
+
+env:
+  PROJECT_ID: ${{ secrets.GKE_PROJECT }}
+  GKE_ZONE: ${{ vars.GKE_PROJECT }}
+  GAR_LOCATION: ${{vars.GAR_LOCATION}}
+  REPOSITORY_ENV: ${{vars.REPOSITORY_ENV}} 
+  IMAGE_NAME: ${{vars.IMAGE_NAME}}
+
+jobs:
+  Build-Publish:
+    name: Build and Publish
+    runs-on: ubuntu-latest
+    environment: dev
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    # Configure Workload Identity Federation and generate an access token.
+    - id: 'auth'
+      uses: 'google-github-actions/auth@v2'
+      with:
+        credentials_json: '${{ secrets.GKE_SA_KEY }}'
+
+    - run: |
+        gcloud --quiet auth configure-docker
+    # Build the Docker image
+    - name: Build
+      run: |-
+        docker build \
+          --tag "gcr.io/$PROJECT_ID/$REPOSITORY_ENV/$IMAGE_NAME:${GITHUB_SHA:0:7}" \
+          --build-arg GITHUB_SHA="$GITHUB_SHA" \
+          --build-arg GITHUB_REF="$GITHUB_REF" \
+          .
+    - name: Publish
+      run: |-
+        docker push "gcr.io/$PROJECT_ID/$REPOSITORY_ENV/$IMAGE_NAME:${GITHUB_SHA:0:7}"
+
+
+  Detect-secrets:
+    name: Run Detect-Secrets
+    runs-on: ubuntu-latest
+    needs: [Build-Publish]
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    # Install detect-secrets
+    - name: Install detect-secrets
+      run: pip install detect-secrets
+
+    # Run detect-secrets to scan the source code
+    - name: Run detect-secrets
+      run: detect-secrets scan .
