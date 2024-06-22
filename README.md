@@ -1,5 +1,8 @@
-ci-simple-next-app
-continuous integration simple NEXT.js app
+Continuous Integration (CI) simple NEXT.js App
+
+Build and Deploy to google container registry (Push and pull images GCR)
+
+
 
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
