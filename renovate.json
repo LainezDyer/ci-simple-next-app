@@ -3,9 +3,9 @@
    "extends":[
       "config:base"
    ],
-   "prHeader":"JamesTestHeader",
+   "prHeader":"DyrlanzTestHeader",
    "assignees":[
-      "james-willett"
+      "clouddyrlanz"
    ],
    "labels":[
       "dependencies-testlabel"
