@@ -21,7 +21,7 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     # Configure Workload Identity Federation and generate an access token.
     - id: 'auth'
@@ -50,7 +50,7 @@ jobs:
     needs: [Build-Publish]
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     # Install detect-secrets
     - name: Install detect-secrets
